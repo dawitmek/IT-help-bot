@@ -5,8 +5,8 @@ const axios = require('axios');
 
 const config = new Configuration({
     apiKey: process.env.OPENAI_TOKEN,
-})
-    ``
+});
+
 const openai = new OpenAIApi(config);
 
 client.on('ready', () => {
@@ -46,14 +46,13 @@ function createEmbed({title: title, content: content}) {
     return new EmbedBuilder()
     .setColor("#FFFFFF")
     .setTitle(title)
-    .setDescription(content)
-    .setTimestamp();
+    .setDescription(content);
 }
 
 function editInteration(content, interaction) {
-    const data = typeof response === 'object' ? { embeds: [content] } : { content: content };
+    const data = typeof content === 'object' ? { embeds: [content] } : { content: content.trim() };
     return axios
-        .patch(`https://discord.com/api/v8/webhooks/${process.env.IT_BOT_CLIENT}/${interaction.token}/messages/@original`, data)
+        .patch(`https://discord.com/api/v8/webhooks/${process.env.IT_BOT_CLIENT}/${interaction.token}/messages/@original`, data);
 }
 
 function generatePrompt(animal) {
