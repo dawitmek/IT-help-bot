@@ -1,12 +1,12 @@
 const { Configuration, OpenAIApi } = require("openai");
-const { Client, GatewayIntentBits } = require('discord.js');
+const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 const axios = require('axios');
 
 const config = new Configuration({
     apiKey: process.env.OPENAI_TOKEN,
 })
-
+    ``
 const openai = new OpenAIApi(config);
 
 client.on('ready', () => {
@@ -30,16 +30,28 @@ client.on('interactionCreate', async (interaction) => {
                 max_tokens: 100
             });
 
-            return editInteration(response.data.choices[0].text, interaction)
+           let embed = createEmbed({title: prompt, content: response.data.choices[0].text});
+
+            return editInteration(embed, interaction)
 
         } catch (err) {
-            return editInteration("An error has occuered. Try again.", interaction)
+            let errEmbed = createEmbed({title: "Error", content: "An error has occured. Try again in a few seconds."});
+
+            return editInteration(errEmbed, interaction)
         }
     }
 });
 
+function createEmbed({title: title, content: content}) {
+    return new EmbedBuilder()
+    .setColor("#FFFFFF")
+    .setTitle(title)
+    .setDescription(content)
+    .setTimestamp();
+}
+
 function editInteration(content, interaction) {
-    let data = { content: content }
+    const data = typeof response === 'object' ? { embeds: [content] } : { content: content };
     return axios
         .patch(`https://discord.com/api/v8/webhooks/${process.env.IT_BOT_CLIENT}/${interaction.token}/messages/@original`, data)
 }
