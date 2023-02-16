@@ -58,7 +58,7 @@ function editInteration(content, interaction) {
 function generatePrompt(animal) {
     const capitalizedAnimal =
         animal[0].toUpperCase() + animal.slice(1).toLowerCase();
-    return `Answer this IT Question with discord text formatting.
+    return `Answer this IT Question with discord text formatting (without using backticks).
   
   
   Question: ${capitalizedAnimal}
