@@ -1,8 +1,14 @@
 const { Configuration, OpenAIApi } = require("openai");
 const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
-const axios = require('axios');
+const { MongoClient, ServerApiVersion } = require('mongodb');
 
+const axios = require('axios');
+const cron = require('node-cron');
+const fetchFile = require("./cronjob.js");
+
+const uri = process.env.MongoClient;
+
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 const config = new Configuration({
     apiKey: process.env.OPENAI_TOKEN,
 });
@@ -13,40 +19,64 @@ client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
 });
 
+client.login(process.env.IT_BOT_TOKEN);
+
+
 client.on('interactionCreate', async (interaction) => {
     if (!interaction.isChatInputCommand()) return;
 
     const command = interaction.commandName;
+    await interaction.deferReply();
 
-    if (command === 'question') {
-        let prompt = interaction.options._hoistedOptions[0].value;
-        await interaction.deferReply();
+    switch (command) {
+        case 'question':
+            let prompt = interaction.options._hoistedOptions[0].value;
+            try {
+                const response = await openai.createCompletion({
+                    model: "text-davinci-003",
+                    prompt: generatePrompt(prompt),
+                    temperature: 0.6,
+                    max_tokens: 100
+                });
 
-        try {
-            const response = await openai.createCompletion({
-                model: "text-davinci-003",
-                prompt: generatePrompt(prompt),
-                temperature: 0.6,
-                max_tokens: 100
+                let embed = createEmbed({ title: prompt, content: response.data.choices[0].text });
+
+                return editInteration(embed, interaction)
+
+            } catch (err) {
+                let errEmbed = createEmbed({ title: "Error", content: "An error has occured. Try again in a few seconds." });
+
+                return editInteration(errEmbed, interaction)
+            }
+            break;
+        case 'upcoming-tasks':
+            const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
+
+            client.connect(err => {
+                console.error("error:", err);
             });
 
-           let embed = createEmbed({title: prompt, content: response.data.choices[0].text});
+            const collection = client.db("IT-Help-Bot").collection("upcoming-events");
+            collection.findOne("")
 
-            return editInteration(embed, interaction)
-
-        } catch (err) {
-            let errEmbed = createEmbed({title: "Error", content: "An error has occured. Try again in a few seconds."});
-
-            return editInteration(errEmbed, interaction)
-        }
+            break;
+        default:
+            break;
     }
 });
 
-function createEmbed({title: title, content: content}) {
-    return new EmbedBuilder()
-    .setColor("#FFFFFF")
-    .setTitle(title)
-    .setDescription(content);
+function createEmbed({ title: title, content: content, objList: objList }) {
+    let embed = EmbedBuilder()
+        .setColor("#FFFFFF")
+        .setTitle(title)
+
+    if (content) {
+        embed.setDescription(content);
+    }
+
+    if (objList) {
+        embed.addFields(objList);
+    }
 }
 
 function editInteration(content, interaction) {
@@ -65,4 +95,8 @@ function generatePrompt(animal) {
   Answer:`;
 }
 
-client.login(process.env.IT_BOT_TOKEN);
+cron.schedule('* * */23 * * *', () => {
+    fetchFile.fetchUpcomingEvents(Date.now());
+    console.log('Exectued cron job at ' + Date.now());
+})
+
