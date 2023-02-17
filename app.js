@@ -57,7 +57,25 @@ client.on('interactionCreate', async (interaction) => {
             });
 
             const collection = client.db("IT-Help-Bot").collection("upcoming-events");
-            collection.findOne("")
+            let doc = await collection.findOne({ "name": 'upcoming-events' });
+
+            if (doc) {
+                let eventData = [];
+
+                for (let i = 0; i < doc.topic.length; i++) {
+                    let indexTime = new Date(doc.times[i]);
+                    let formattedHour = indexTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    let formattedDate = indexTime.toString().substring(0, indexTime.toString().indexOf(indexTime.getFullYear().toString())+4);
+                    let formattedDateTime = formattedDate + " " + formattedHour;
+
+                    eventData.push({ "name": doc.topic[i], "value": formattedDateTime });
+                }
+                let dataEmbed = createEmbed({title: "Upcoming events", objList: eventData});
+
+                editInteration(dataEmbed, interaction);
+            } else {
+                editInteration(createEmbed({title: "ERROR: Try again later"}), interaction);
+            }
 
             break;
         default:
@@ -66,8 +84,8 @@ client.on('interactionCreate', async (interaction) => {
 });
 
 function createEmbed({ title: title, content: content, objList: objList }) {
-    let embed = EmbedBuilder()
-        .setColor("#FFFFFF")
+    let embed = new EmbedBuilder()
+        .setColor("#21cccc")
         .setTitle(title)
 
     if (content) {
@@ -75,12 +93,13 @@ function createEmbed({ title: title, content: content, objList: objList }) {
     }
 
     if (objList) {
-        embed.addFields(objList);
+        objList.forEach(obj => embed.addFields(obj));
     }
+    return embed;
 }
 
 function editInteration(content, interaction) {
-    const data = typeof content === 'object' ? { embeds: [content] } : { content: content.trim() };
+    const data = typeof content === 'object' ? { embeds: [content] } : { content: content };
     return axios
         .patch(`https://discord.com/api/v8/webhooks/${process.env.IT_BOT_CLIENT}/${interaction.token}/messages/@original`, data);
 }
