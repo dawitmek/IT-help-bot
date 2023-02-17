@@ -6,6 +6,7 @@ const commands = [
 		option.setName('text')
 		.setDescription('Enter your question.')
 		.setRequired(true)),
+	new SlashCommandBuilder().setName('upcoming-tasks').setDescription('Gets the upcoming tasks for IT.'),
 ];
 
 const rest = new REST({ version: '10' }).setToken(process.env.IT_BOT_TOKEN);
