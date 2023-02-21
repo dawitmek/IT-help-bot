@@ -3,7 +3,7 @@ const puppeteer = require("puppeteer");
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = process.env.MongoClient;
 
-async function fetchUpcomingEvents(cronTime) {
+module.exports = async (cronTime) => {
     const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
     client.connect(err => {
@@ -83,4 +83,3 @@ async function fetchUpcomingEvents(cronTime) {
     }
 };
 
-module.exports = fetchUpcomingEvents;
