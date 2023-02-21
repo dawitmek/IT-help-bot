@@ -35,8 +35,6 @@ module.exports = async (cronTime) => {
         await page.type("#password", password);
         await page.click("#loginbtn", { delay: 300 });
 
-        console.log('clicked on button');
-
 
         // Wait for the page to load after logging in
         await page.waitForNavigation();
@@ -63,7 +61,7 @@ module.exports = async (cronTime) => {
             }
         });
 
-        formatedTime.forEach(time => console.log(time))
+        console.log(formatedTime);
 
 
         await collection.updateOne({ "name": 'upcoming-events' }, {
