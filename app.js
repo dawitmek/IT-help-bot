@@ -114,9 +114,9 @@ function generatePrompt(animal) {
   Answer:`;
 }
 
-let task = cron.schedule('* * */12 * * *', () => {
+let task = cron.schedule('*/59 * * * * *', () => {
     fetchFile(Date.now());
-    console.log('Exectued cron job at ' + Date.now());
+    console.log('Exectued cron job at ' + new Date());
 });
 
 task.start();

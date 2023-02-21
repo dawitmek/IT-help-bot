@@ -50,18 +50,23 @@ module.exports = async (cronTime) => {
         const times = await contentpage.$$eval('.block_calendar_upcoming .event .date', links => links.map(link => link.innerText + `, ${new Date(Date.now()).getFullYear()}`));
 
         let formatedTime = times.map(time => {
+            console.log(time);
             if (time.toLowerCase().includes('today')) {
                 let now = new Date(Date.now());
                 let hour = time.toString().split(',')[1];
 
-                new Date(`${now.toLocaleString('default', { weekday: 'long' })} ${now.toLocaleString('default', { month: 'long' })} ${now.getDate()} ${now.getFullYear()} ${hour}`);
+                return new Date(`${now.toLocaleString('default', { weekday: 'long' })} ${now.toLocaleString('default', { month: 'long' })} ${now.getDate()} ${now.getFullYear()} ${hour}`).toString();
+            } else if(time.toLowerCase().includes('tomorrow')) {
+                let now = new Date(Date.now());
+                let hour = time.toString().split(',')[1];
+
+                return new Date(`${now.getDate()+1} ${now.toLocaleString('default', { month: 'long' })} ${now.getFullYear()} ${hour}`).toString();
             } else {
                 return new Date(Date.parse(time)).toString();
-
             }
         });
 
-        console.log(formatedTime);
+        console.log("formatted:", formatedTime);
 
 
         await collection.updateOne({ "name": 'upcoming-events' }, {
