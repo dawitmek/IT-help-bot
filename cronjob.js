@@ -15,7 +15,7 @@ module.exports = async (cronTime) => {
     try {
         const username = process.env.NPusername;
         const password = process.env.NPpass;
-        const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch({ args: ['--no-sandbox'] });;
         const page = await browser.newPage();
 
         // Navigate to the login page
