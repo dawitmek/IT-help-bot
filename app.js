@@ -36,7 +36,7 @@ client.on('interactionCreate', async (interaction) => {
                     model: "text-davinci-003",
                     prompt: generatePrompt(prompt),
                     temperature: 0.6,
-                    max_tokens: 1000
+                    max_tokens: 2000
                 });
 
                 let embed = createEmbed({ title: prompt, content: response.data.choices[0].text });
