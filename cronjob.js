@@ -73,7 +73,7 @@ module.exports = async (cronTime) => {
             $set: {
                 "topic": [...topics],
                 "times": [...formatedTime],
-                "last-cron-job": cronTime,
+                "last-cron-job": new Date(cronTime),
             }
         }, { upsert: true })
 

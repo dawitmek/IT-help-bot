@@ -114,10 +114,13 @@ function generatePrompt(animal) {
   Answer:`;
 }
 
-let task = cron.schedule('* * */12 * * *', () => {
-    fetchFile(Date.now());
-    console.log('Exectued cron job at ' + new Date());
+cron.schedule('* * */12 * * *', () => {
+    if (new Date().toLocaleString().split(' ')[1].split(' ')[0] == '12:00:00') {
+        fetchFile(Date.now());
+        console.log('Exectued cron job at ' + new Date());
+    } else {
+        console.log("cron job tried but didn't run");
+    }
 });
 
-task.start();
 
