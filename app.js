@@ -114,8 +114,8 @@ function generatePrompt(animal) {
   Answer:`;
 }
 
-cron.schedule('* * */12 * * *', () => {
-    if (new Date().toLocaleString().split(' ')[1].split(' ')[0] == '12:00:00') {
+cron.schedule('* * 12 * * *', () => {
+    if (new Date().toLocaleString().split(' ')[1].split(' ')[0] == '12:00:00 PM') {
         fetchFile(Date.now());
         console.log('Exectued cron job at ' + new Date());
     } else {
