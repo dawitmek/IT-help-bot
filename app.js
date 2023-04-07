@@ -119,7 +119,7 @@ cron.schedule('* * 12 * * *', () => {
         fetchFile(Date.now());
         console.log('Exectued cron job at ' + new Date());
     } else {
-        console.log("cron job tried but didn't run");
+        console.log("At " + new Date().toLocaleString() + ": cron job tried but didn't run");
     }
 });
 
